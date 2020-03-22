@@ -1,0 +1,67 @@
+<project name="Flashcards"
+         basedir="."
+         default="all">
+
+    <property name="assets" value="${basedir}/assets"/>
+    <property name="build" value="${basedir}/build"/>
+    <property name="libraries" value="${basedir}/libraries"/>
+    <property name="sources" value="${basedir}/sources"/>
+    <property name="jarFile" value="flashcards.jar"/>
+    <property name="mainClass" value="flashcards.Main"/>
+    <property name="testClass" value="flashcards.Test"/>
+
+    <target name="clean">
+        <delete dir="${build}"/>
+        <delete file="${jarFile}"/>
+    </target>
+
+    <target name="prepare">
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac destdir="${build}"
+               target="1.8"
+               source="1.8"
+               includeantruntime="false"
+               debug="on">
+            <src path="${sources}"/>
+            <exclude name="**/Test*"/>
+            <classpath>
+                <fileset dir="${libraries}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="package" depends="compile">
+        <jar destfile="${jarFile}">
+            <fileset dir="${assets}"/>
+            <fileset dir="${build}"/>
+            <zipgroupfileset dir="${libraries}" includes="**/*.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="${mainClass}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="test" depends="clean, prepare">
+        <javac destdir="${build}"
+               target="1.8"
+               source="1.8"
+               includeantruntime="false"
+               debug="on">
+            <src path="${sources}"/>
+            <classpath>
+                <fileset dir="${libraries}" includes="**/*.jar"/>
+            </classpath>
+        </javac>
+        <java classname="${testClass}">
+            <classpath>
+                <fileset dir="${libraries}" includes="**/*.jar"/>
+                <pathelement path="${assets}"/>
+                <pathelement path="${build}"/>
+            </classpath>
+        </java>
+    </target>
+
+</project>

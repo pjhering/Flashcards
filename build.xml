@@ -1,6 +1,6 @@
 <project name="Flashcards"
          basedir="."
-         default="all">
+         default="package">
 
     <property name="assets" value="${basedir}/assets"/>
     <property name="build" value="${basedir}/build"/>

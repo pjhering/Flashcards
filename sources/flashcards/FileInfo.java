@@ -16,4 +16,10 @@ public class FileInfo
     public File getFile () { return file; }
 
     public FileType getType () { return type; }
+
+    @Override
+    public String toString ()
+    {
+        return file.getName ();
+    }
 }

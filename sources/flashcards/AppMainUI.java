@@ -16,8 +16,10 @@ public class AppMainUI extends JFrame
     JMenuItem practiceReviewItem;
     JList<FileInfo> leftList;
     DefaultListModel<FileInfo> leftListModel;
+    JList<Practice> rightList;
+    DefaultListModel<Practice> rightListModel;
 
-    public AppMainUI (List<FileInfo> iList, List<FileInfo> pList)
+    public AppMainUI (List<FileInfo> iList, List<Practice> pList)
     {
         super ("flashcards");
         setDefaultCloseOperation (JFrame.DO_NOTHING_ON_CLOSE);
@@ -28,7 +30,7 @@ public class AppMainUI extends JFrame
         actions = new AppMainActions (this);
     }
 
-    private void initializeContentPane (List<FileInfo> iList, List<FileInfo> pList)
+    private void initializeContentPane (List<FileInfo> iList, List<Practice> pList)
     {
         JPanel content = new JPanel (new GridLayout (1, 2, 10, 10));
         content.setBorder (BorderFactory.createEmptyBorder (10, 10, 10, 10));
@@ -42,7 +44,9 @@ public class AppMainUI extends JFrame
         leftLabelPanel.add (new JScrollPane (leftList));
         content.add (leftLabelPanel);
 
-        JList<FileInfo> rightList = new JList<FileInfo> (pList.toArray (new FileInfo[pList.size ()]));
+        rightListModel = new DefaultListModel<> ();
+        pList.forEach ((p) -> { rightListModel.addElement (p); });
+        rightList = new JList<Practice> (rightListModel);
         rightList.setSelectionMode (SINGLE_SELECTION);
         JPanel rightLabelPanel = new JPanel (new GridLayout (1, 1));
         rightLabelPanel.setBorder (BorderFactory.createTitledBorder (BorderFactory.createLineBorder (Color.GRAY, 1), "practice"));

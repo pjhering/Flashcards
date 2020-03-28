@@ -19,7 +19,7 @@ public class Main
         try
         {
             List<FileInfo> importList = createFileInfoList (importDir, FileType.IMPORTED);
-            List<FileInfo> practiceList = createFileInfoList (practiceDir, FileType.PRACTICE);
+            List<Practice> practiceList = createPracticeList (practiceDir, FileType.PRACTICE);
 
             AppMainUI ui = new AppMainUI (importList, practiceList);
             ui.start ();
@@ -28,6 +28,11 @@ public class Main
         {
             JOptionPane.showMessageDialog (null, ex, "ERROR", JOptionPane. ERROR_MESSAGE);
         }
+    }
+
+    static List<Practice> createPracticeList (File dir, FileType type) throws Exception
+    {
+        return new ArrayList<Practice> ();
     }
 
     static List<FileInfo> createFileInfoList (File dir, FileType type) throws Exception

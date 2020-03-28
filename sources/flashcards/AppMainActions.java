@@ -3,6 +3,7 @@ package flashcards;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import static flashcards.Main.importDir;
+import static flashcards.Main.practiceDir;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileReader;
@@ -85,8 +86,7 @@ public class AppMainActions
 
         // create reader for the imported file
         try (FileReader reader = new FileReader (file))
-        {
-            // validate by deserializing a Deck object with gson
+        {   // validate by deserializing a Deck object with gson
             Gson gson = new Gson ();
             Deck deck = gson.fromJson (reader, Deck.class);
 
@@ -122,17 +122,76 @@ public class AppMainActions
 
     private void fileDeleteAction ()
     {
-        System.out.println ("fileDeleteAction");
-    }
+        // get selected FileInfo
+        FileInfo fi = ui.leftList.getSelectedValue ();
+        if (fi == null) return;
 
-    private void practiceDeleteAction ()
-    {
-        System.out.println ("practiceDeleteAction");
+        // attempt to delete file
+        File f = fi.getFile ();
+        if (f.delete ())
+        {   // remove FileInfo from imports list
+            ui.leftListModel.removeElement (fi);
+
+            // provide feedback to the user
+            showMessageDialog (ui.leftList, "Deleted " + f.getName ());
+        }
+        else
+        {   // provide feedback to the user
+            showMessageDialog (ui.leftList, "Oops... That didn't work.");
+        }
     }
 
     private void practiceCreateAction ()
     {
-        System.out.println ("practiceCreateAction");
+        // get selected FileInfo from the imports list
+        FileInfo fi = ui.leftList.getSelectedValue ();
+        if (fi == null) return;
+
+        try (FileReader reader = new FileReader (fi.getFile ()))
+        {   // deserialize Deck object
+            Gson gson = new Gson ();
+            Deck deck = gson.fromJson (reader, Deck.class);
+
+            // determine name for and create new file in practice folder
+            int count = 1;
+            File file;
+            while (true)
+            {
+                String name = deck.getTitle () + "-" + count + ".json";
+                file = new File (practiceDir, name);
+                if (!file.exists ())
+                {
+                    break;
+                }
+                else
+                {
+                    count += 1;
+                }
+            }
+            // create new Practice object with Deck and File
+            Practice practice = new Practice (deck, file.getName ());
+
+            try (FileWriter writer = new FileWriter (file))
+            {
+                // serialize the Practice object
+                JsonWriter json = gson.newJsonWriter (writer);
+                gson.toJson (practice, Practice.class, json);
+
+                // add Practice object to practice list
+                ui.rightListModel.addElement (practice);
+
+                // provide feedback to user
+                showMessageDialog (ui.rightList, "Created " + practice.toString ());
+            }
+        }
+        catch (Exception ex)
+        {
+            showMessageDialog (ui.leftList, "Error: " + ex.getMessage ());
+        }
+    }
+
+    private void practiceDeleteAction ()
+    {
     }
 
     private void practiceReviewAction ()

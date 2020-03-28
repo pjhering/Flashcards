@@ -1,6 +1,7 @@
 package flashcards;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonWriter;
 import static flashcards.Main.importDir;
 import static flashcards.Main.practiceDir;
@@ -87,7 +88,10 @@ public class AppMainActions
         // create reader for the imported file
         try (FileReader reader = new FileReader (file))
         {   // validate by deserializing a Deck object with gson
-            Gson gson = new Gson ();
+            Gson gson = new GsonBuilder ()
+                .setPrettyPrinting ()
+                .serializeNulls ()
+                .create ();
             Deck deck = gson.fromJson (reader, Deck.class);
 
             // create a new file in the imports folder
@@ -149,7 +153,10 @@ public class AppMainActions
 
         try (FileReader reader = new FileReader (fi.getFile ()))
         {   // deserialize Deck object
-            Gson gson = new Gson ();
+            Gson gson = new GsonBuilder ()
+                .setPrettyPrinting ()
+                .serializeNulls ()
+                .create ();
             Deck deck = gson.fromJson (reader, Deck.class);
 
             // determine name for and create new file in practice folder
@@ -192,6 +199,26 @@ public class AppMainActions
 
     private void practiceDeleteAction ()
     {
+        // get selected practice item from list
+        Practice p = ui.rightList.getSelectedValue ();
+        if (p == null) return;
+
+        // create file
+        File f = new File (practiceDir, p.getFileName ());
+
+        // delete file
+        if (f.delete ())
+        {
+            // remove practice item from list
+            ui.rightListModel.removeElement (p);
+
+            // provide feedback to user
+            showMessageDialog (ui.rightList, "Deleted " + p.toString ());
+        }
+        else
+        {
+            showMessageDialog (ui.rightList, "Oops... That didn't work.");
+        }
     }
 
     private void practiceReviewAction ()

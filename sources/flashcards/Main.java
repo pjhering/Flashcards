@@ -1,6 +1,8 @@
 package flashcards;
 
+import com.google.gson.Gson;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,37 @@ public class Main
 
     static List<Practice> createPracticeList (File dir, FileType type) throws Exception
     {
-        return new ArrayList<Practice> ();
+        if (!dir.exists ())
+        {
+            dir.mkdirs ();
+
+            File readme = new File (dir, "README.txt");
+            try (FileWriter writer = new FileWriter (readme))
+            {
+                writer.write ("WARNING!\n");
+                writer.write ("Do not edit or delete the files in this folder.\n");
+                writer.write ("They are for use with the flashcards application.\n");
+                writer.write ("Modifying these files could make them unusable.\n");
+                writer.write ("\n");
+                writer.flush ();
+            }
+        }
+        File[] files = dir.listFiles ((File f, String s) -> {
+            return s.endsWith (".json");
+        });
+        List<Practice> list = new ArrayList<> ();
+        Gson gson = new Gson ();
+
+        for (File f : files)
+        {
+            try (FileReader fr = new FileReader (f))
+            {
+                Practice p = gson.fromJson (fr, Practice.class);
+                list.add (p);
+            }
+        }
+
+        return list;
     }
 
     static List<FileInfo> createFileInfoList (File dir, FileType type) throws Exception
